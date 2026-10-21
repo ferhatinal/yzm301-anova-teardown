@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "powerlab"
+version = "0.1.0"
+description = "Eğitim amaçlı istatistiksel güç hesabı motoru ve CLI (YZM301 Teardown Sprint)"
+requires-python = ">=3.10"
+dependencies = ["scipy>=1.10"]
+
+[project.optional-dependencies]
+test = ["statsmodels>=0.14"]
+
+[project.scripts]
+gpower-clone = "powerlab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

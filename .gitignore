@@ -1,0 +1,17 @@
+# G*Power ikilisi repoya KONMAZ (yalnızca resmi sayfadan dağıtılabilir)
+GPower.exe
+GPower*.exe
+*.exe
+*.gpr
+
+# Ghidra / REA çalışma çıktıları: decompile çıktısı teslim edilmez
+ghidra_projects/
+*.gzf
+*.rep
+rea_workdir/
+decompiled/
+
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/

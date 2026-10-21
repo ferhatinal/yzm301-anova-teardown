@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Kurulum gerektirmeden çalıştırma: ./bin/gpower-clone --test t2-indep --mode a-priori ...
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHONPATH="$DIR/src${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m powerlab "$@"
