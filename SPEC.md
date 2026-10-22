@@ -37,8 +37,15 @@ Senaryo: hedef gücü sağlayan en küçük N                 # LEDGER L5  [HIPO
 Senaryo: N grup sayısının katıdır                       # LEDGER L6  [HIPOTEZ H-07]
   Diyelim ki groups=3
   O zaman n_total, 3'ün katıdır ve n_per_group = n_total / 3
-  # Ders kitaplarında anılan 159 ve 252, birer-artış aramasının bulduğu 158 ve 251'den 1 büyüktür;
-  # bu H-07'yi destekleyen DOLAYLI bir işarettir, kanıt DEĞİL. G*Power ekranından doğrulanacak.
+  # KANIT DURUMU: [DOK] kılavuz Örnek 10.3 (k=10, f=0.25, alpha=0.05, güç=0.95) N=390 verir;
+  # birer-artış arama 386 verirdi. Bu H-07'yi destekler ama TEK bir k için ([REA] veya GUI vektörü değil).
+  # k=3 için (158 mi 159 mu?) GUI vektörü hâlâ bekleniyor.
+
+Senaryo: kılavuz örneği (basılı çıktı)                  # LEDGER L15  [DOK]
+  Diyelim ki f=0.25, alpha=0.05, power=0.95, groups=10
+  Eğer a-priori modu çalıştırılırsa
+  O zaman n_total=390 ve n_per_group=39
+  Ve df1=9, df2=380, ncp=24.375, critical=1.904538, actual_power=0.952363
 
 Senaryo: alt sınır                                      # LEDGER L7  [HIPOTEZ H-03]
   Diyelim ki f çok büyük (ör. 5)

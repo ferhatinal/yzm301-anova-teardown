@@ -28,6 +28,6 @@ Bu dosyaya yalnızca gerçekten yaşananlar yazılır.
 deyip kod izi gösterememesi, ya da N yuvarlamasını yanlış yorumlaması) buraya şu başlıklarla yaz:
 ajanın iddiası · nasıl fark ettin · hangi test/vektör yakaladı · düzeltme.*
 
-*Aday: H-07 (N, k katına yuvarlanıyor mu?). G\*Power ekranından f=.25, α=.05, güç=.80, k=3 için
-158 çıkarsa bu motorun varsayımı yanlış demektir; `ROUND_TO_MULTIPLE_OF_GROUPS=False` yap ve
-kaydı buraya yaz. 159 çıkarsa hipotez doğrulanmış olur ve burada kayıt gerekmez.*
+*Aday: H-07 (N, k katına yuvarlanıyor mu?). Kılavuz Örnek 10.3 (k=10) hipotezi destekledi (390, 386 değil),
+dolayısıyla ihtimal düştü. Yine de G\*Power ekranından f=.25, α=.05, güç=.80, k=3 için 158 çıkarsa
+varsayım k=3'te yanlış demektir: kaydı buraya yaz. 159 çıkarsa burada kayıt gerekmez.*

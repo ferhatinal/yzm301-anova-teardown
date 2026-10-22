@@ -6,6 +6,19 @@
 `oracle/gpower_anova-oneway.csv` **boş**. Uyum oranı **ölçülmedi**. Ödevin kapısı (gizli vektörlerde
 N tam eşleşmesi ≥ %90) bu katman dolana kadar değerlendirilemez.
 
+## 1b) Kılavuz katmanı ([DOK] kâhin: G\*Power 3.1 kılavuzundaki basılı örnek çıktılar)
+`oracle/manual_anova-oneway.csv`; `python tests/differential.py manual anova-oneway`: **2/2 uyum**.
+
+| Örnek | Girdi | Kılavuz | Motor |
+|---|---|---|---|
+| 10.3 a priori | k=10, f=.25, α=.05, güç=.95 | N=390, güç 0.952363, λ=24.375, F\*=1.904538, df 9/380 | **birebir** (6 basamak) |
+| 10.3 compromise, post hoc yönünde | k=10, f=.25, α=.159194, N=200 | güç 0.840806, F\*=1.476210 | 0.840805 / 1.476211 (α 6 basamağa yuvarlı olduğu için ±1e-6) |
+
+**H-07 için ayırt edici kanıt:** aynı girdide birer-artış arama **386** verir, kılavuz **390** der; k-katı kuralı 390'ı verir.
+Bu yüzden varsayılan `ROUND_TO_MULTIPLE_OF_GROUPS = True` kalır. Sınır: bu yalnızca k=10 içindir ve kılavuz
+değerleridir, GUI ekran görüntüsü ya da [REA] kanıtı değildir. Kılavuzdaki 6 basamak, motor çıktısının 4 basamaklı
+sözleşme biçiminden daha sıkı karşılaştırılır (birim testte).
+
 ## 2) Kütüphane katmanı (yardımcı kâhin, statsmodels.FTestAnovaPower, 600 vektör)
 
 | Motor ayarı | Tam uyum (n_total) | Açıklama |

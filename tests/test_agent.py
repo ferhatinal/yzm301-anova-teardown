@@ -123,14 +123,19 @@ class Evaluator(unittest.TestCase):
         self.assertGreaterEqual(len(supported), 5)
         for q in supported:   # beklenen parametreler aracın zorunlu alanlarıyla birebir
             self.assertEqual(set(q["expected_params"]), set(tools.TOOLS[q["expected_tool"]]["input_schema"]["required"]), q["id"])
-        # kâhin alanları uydurulmamış: G*Power'dan gelene kadar boş
-        self.assertTrue(all(q["expected_n_total"] is None and q["expected_power"] is None for q in QUESTIONS))
+        # kâhin alanları uydurulmamış: yalnızca kaynağı belgelenmiş değer dolu (q02 = kılavuz Örnek 10.3)
+        filled = [q["id"] for q in QUESTIONS if q["expected_n_total"] is not None]
+        self.assertEqual(filled, ["q02"])
+        self.assertEqual(QUESTIONS[1]["expected_n_total"], 390)
+        self.assertIn("manual", QUESTIONS[1]["oracle_source"])
+        self.assertTrue(all(q["expected_power"] is None for q in QUESTIONS))
 
     def test_perfect_agent_scores_full(self):
         s = evaluate.summarize(self.run_all(perfect_script()))
         self.assertEqual(s["arac_secimi"]["oran"], 1.0)
         self.assertEqual(s["parametreler"]["oran"], 1.0)
-        self.assertIsNone(s["N_tam_eslesme"]["oran"])      # kâhin boş -> ölçülmedi, 0 değil
+        self.assertEqual(s["N_tam_eslesme"]["olculen"], 1)  # yalnızca kaynaklı q02 ölçülür; diğerleri "ölçülmedi", 0 değil
+        self.assertEqual(s["N_tam_eslesme"]["oran"], 1.0)
 
     def test_wrong_group_count_is_caught(self):
         script = perfect_script()

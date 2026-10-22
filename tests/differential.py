@@ -6,6 +6,7 @@
 
 Kullanım:
   python tests/differential.py gpower  [aile]   # varsayılan aile: anova-oneway
+  python tests/differential.py manual  [aile]   # G*Power kılavuzundaki basılı örnek çıktılar ([DOK] kâhin)
   python tests/differential.py library [aile]
   python tests/differential.py generate [aile]  # library CSV'sini yeniden üret
 
@@ -201,7 +202,7 @@ if __name__ == "__main__":
         sys.exit(2)
     if mode == "generate":
         generate_library(fam)
-    elif mode in ("library", "gpower"):
+    elif mode in ("library", "gpower", "manual"):
         sys.exit(report(os.path.join(ORACLE, f"{mode}_{fam}.csv"), fam))
     else:
         print(__doc__)

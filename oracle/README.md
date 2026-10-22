@@ -3,6 +3,7 @@
 | Dosya | İçerik | Durum |
 |---|---|---|
 | `gpower_anova-oneway.csv` | G*Power 3.1.9.7 arayüzünden ELLE toplanan vektörler (asıl kâhin) | **BOŞ: sen dolduracaksın** (en az 30, her biri ekran görüntüsüyle) |
+| `manual_anova-oneway.csv` | G\*Power 3.1 kılavuzundaki basılı örnek çıktılar ([DOK]; GUI ekran görüntüsü DEĞİL, bu yüzden ≥30 şartına sayılmaz) | hazır, 2 satır |
 | `library_anova-oneway.csv` | `statsmodels.FTestAnovaPower` ile üretilen 600 vektör (yardımcı kâhin) | üretildi |
 | `gpower_t2-indep.csv`, `library_t2-indep.csv` | referans aile (ödev sözleşmesi örneği) | teslimden önce silinebilir |
 

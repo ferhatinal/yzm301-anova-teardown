@@ -113,6 +113,39 @@ class APriori(unittest.TestCase):
         self.assertAlmostEqual(a.actual_power, b.actual_power, places=12)
 
 
+class ManualExample(unittest.TestCase):
+    """[DOK] G*Power 3.1 kılavuzu (Haziran 2023), Bölüm 10, Örnek 10.3: kılavuzun BASILI çıktısı.
+
+    Kâhin G*Power ekranı değil, kılavuzdaki sayılardır (6 basamak). Bu örnek H-07 için bağımsız
+    kanıttır: birer-artış arama 386 verir, kılavuz 390 verir.
+    """
+
+    def test_a_priori_matches_printed_output_to_six_digits(self):
+        r = A.a_priori(0.25, 0.05, 0.95, 10)
+        self.assertEqual(r.n_total, 390)
+        self.assertEqual(r.n_total // 10, 39)             # kılavuz: "39 subjects in each of the 10 groups"
+        self.assertEqual((r.df1, r.df2), (9, 380))
+        self.assertEqual(round(r.actual_power, 6), 0.952363)
+        self.assertEqual(round(r.critical, 6), 1.904538)
+        self.assertEqual(round(r.ncp, 6), 24.375)
+
+    def test_unit_step_search_would_have_given_386_not_390(self):
+        old = A.ROUND_TO_MULTIPLE_OF_GROUPS
+        try:
+            A.ROUND_TO_MULTIPLE_OF_GROUPS = False
+            self.assertEqual(A.a_priori(0.25, 0.05, 0.95, 10).n_total, 386)
+        finally:
+            A.ROUND_TO_MULTIPLE_OF_GROUPS = old
+
+    def test_compromise_example_cross_check_with_printed_alpha(self):
+        # Kılavuzun compromise çıktısı: alpha=0.159194, N=200, k=10 -> güç 0.840806, F* 1.476210
+        r = A.post_hoc(0.25, 0.159194, 10, 200)
+        self.assertAlmostEqual(r.actual_power, 0.840806, places=5)   # alpha 6 basamağa yuvarlı
+        self.assertAlmostEqual(r.critical, 1.476210, places=5)
+        self.assertEqual((r.df1, r.df2), (9, 190))
+        self.assertEqual(round(r.ncp, 6), 12.5)
+
+
 class Boundaries(unittest.TestCase):
     """Bölüm testi sınıfları (Sommerville 8.1.2): dejenere, çok küçük, Cohen eşikleri, çok büyük."""
 

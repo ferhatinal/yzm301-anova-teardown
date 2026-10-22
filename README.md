@@ -5,6 +5,8 @@
 
 > ⚠️ Ödevin kapısı: gizli vektörlerde N tam eşleşmesi ≥ %90. **G\*Power ile eşleşme henüz ölçülmedi**, bu yüzden MCP ve ajan katmanlarının puanı bu kapı doğrulanana kadar belirsizdir.
 
+> **Kalan işler (senin bilgisayarında yapılacaklar) için: [`YAPILACAKLAR.md`](YAPILACAKLAR.md).**
+
 > Bu çalışma eğitim amaçlıdır. Yazılım, G\*Power'ın bir kopyası değildir ve onun adıyla sunulmaz.
 > Hesap motoru `gpower-clone` komut adıyla (ödev sözleşmesi gereği) çalışır.
 
@@ -15,8 +17,9 @@
 | Motor + CLI (ANOVA, a priori + post hoc) | yazıldı |
 | MCP sunucusu (`powerlab.mcp_server`, 2 araç) | yazıldı; CLI = MCP eşitliği 14 girdide test edildi |
 | Ajan (`powerlab.agent`) + 10 soruluk Türkçe set (`eval/`) | yazıldı; döngü sahte istemciyle test edildi, **gerçek model ölçülmedi** |
-| Testler | 61 birim/entegrasyon testi geçiyor (Python 3.13, mcp 2.3.0, anthropic 1.17.0) |
+| Testler | 64 birim/entegrasyon testi geçiyor (Python 3.13, mcp 2.3.0, anthropic 1.17.0) |
 | Kütüphane kâhini (statsmodels, 600 vektör) | üretildi; 428 uyuşmazlık tek bir hipoteze (H-07) bağlanıyor, 0 açıklanmamış |
+| Kılavuz kâhini (`oracle/manual_anova-oneway.csv`, [DOK]) | 2 basılı örnek; motor 6 basamağa uyuyor ve k-katı yuvarlama (H-07) kanıtlandı: k=10 için 386 değil 390 |
 | **G\*Power kâhini (`oracle/gpower_anova-oneway.csv`)** | **BOŞ: ≥30 vektör elle toplanacak** (`tools/add_oracle_row.py` yardımcı) |
 | **REA bulguları (`LEDGER.md` C bölümü)** | **BOŞ: [REA] satırı yok** |
 | **MCP vs GUI token ölçümü** | **BOŞ**: protokol `eval/README.md`'de |
@@ -62,7 +65,7 @@ değerlendirme, kayıtlar ve token ölçüm protokolü: `eval/README.md`. **Yaln
 
 ## Testler
 ```sh
-python -m unittest discover -s tests -p "test_*.py"     # birim, bölüm/sınır, sözleşme, MCP, ajan (61 test)
+python -m unittest discover -s tests -p "test_*.py"     # birim, bölüm/sınır, sözleşme, MCP, ajan (64 test)
 python tests/differential.py library anova-oneway       # kütüphane kâhini
 python tests/differential.py gpower  anova-oneway       # G*Power kâhini (CSV doldurulunca)
 python tools/add_oracle_row.py --help                    # G*Power sonucunu CSV'ye güvenle ekle
