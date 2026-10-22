@@ -8,7 +8,7 @@ Sırayla yaparsan toplam ~1,5–2 saat. En çok puan getiren: **2 ve 3**.
 REA'nın durum raporu: *"Ghidra: not_configured, Set GHIDRA_INSTALL_DIR to an extracted Ghidra 12.1.x release directory"*;
 IDA yok, Hopper Windows'ta desteklenmiyor. Yani Ghidra olmadan G\*Power'ın yerel ikilisi incelenemez.
 1. JDK 21 kur (ör. Eclipse Temurin 21), `java -version` ile doğrula.
-2. Ghidra 12.1.x'i ghidra-sre.org'dan indir, `C:\tools\ghidra_12.1` gibi bir klasöre aç.
+2. Ghidra 12.1.x'i ghidra-sre.org'dan indir (G\*Power 32 bit x86 PE; Ghidra bunu destekler), `C:\tools\ghidra_12.1` gibi bir klasöre aç.
 3. Ortam değişkeni (PowerShell): `[Environment]::SetEnvironmentVariable("GHIDRA_INSTALL_DIR","C:\tools\ghidra_12.1","User")`
 4. Claude Desktop'u tamamen kapat ve yeniden aç (REA sunucusu yeniden başlar).
 5. Doğrula: ajana "REA araçları ve Ghidra sağlayıcısı bu oturumda kullanılabilir mi? Kaç araç aktif?" de, cevabın
@@ -16,7 +16,7 @@ IDA yok, Hopper Windows'ta desteklenmiyor. Yani Ghidra olmadan G\*Power'ın yere
 
 ## 2. G\*Power 3.1.9.7 ve kâhin vektörleri ~45 dk (puanın %90 kapısı bunlara bağlı)
 1. YALNIZCA resmi sayfadan indir (psychologie.hhu.de, G\*Power sayfası). `GPower.exe` repoya konmaz.
-2. Hash: `Get-FileHash .\GPower.exe -Algorithm SHA256` → çıktıyı `README.md`'deki `TODO`'ya yaz.
+2. Hash: REA ile hesaplandı ve README'ye yazıldı (`GPowerNT.exe`, c63e6a13…). İstersen `Get-FileHash .\GPowerNT.exe -Algorithm SHA256` ile kendin de doğrula.
 3. **İlk vektör:** F tests → ANOVA: Fixed effects, omnibus, one-way → A priori; f=0.25, α=0.05, güç=0.80, 3 grup.
    Toplam N **158 mi 159 mu?** (kılavuz Örnek 10.3 zaten k-katı kuralını destekliyor; bu k=3'ü kesinleştirir.)
 4. `oracle/README.md`'deki vektör planına göre **en az 30** vektör topla (Cohen eşikleri, güç 0.80–0.99,
@@ -30,7 +30,7 @@ IDA yok, Hopper Windows'ta desteklenmiyor. Yani Ghidra olmadan G\*Power'ın yere
 
 ## 3. REA incelemesi (Oturum 1) ve temiz oda yazımı (Oturum 2) ~30–60 dk
 1. Ghidra hazır olunca **yeni bir sohbet** aç, `prompts/01_inspect_session.md` içeriğini yapıştır ve
-   `GPower.exe`'nin tam yolunu ver. (Ya da bana yolu yaz; incelemeyi ayrı bir oturumda yürütürüm.)
+   yolu ver: `C:\Users\ferha\Desktop\GPowerWin_3.1.9.7\GPower_3.1.9.7_143\GPowerNT.exe`. (Ya da bana yaz; Ghidra kurulunca incelemeyi ayrı bir oturumda ben yürütürüm.)
 2. Çıkan bulguları `LEDGER.md` C bölümüne ([REA], adres/dize referansıyla) ve `SPEC.md`'ye işle.
    Ajanın kanıtsız söylediği bir şeyi `HALLUCINATIONS.md`'ye yaz (ödev: en az 2 kayıt; H-A hazır).
 3. **Ayrı** bir oturumda yalnızca `SPEC.md` ile `prompts/02_write_session.md`'yi çalıştır. Bu iskeletin

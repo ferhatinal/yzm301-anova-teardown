@@ -3,8 +3,8 @@
 Etiketler: **[DOK]** kılavuzda/makalede yazıyor · **[REA]** binary'den kanıtlandı (adres veya dize
 referansı zorunlu) · **[AJAN]** ajanın çıkarımı, kanıtı yok. Puan yalnızca [REA] satırlarına verilir.
 
-> **Dürüst durum:** Bu defterde şu an **hiç [REA] satırı yok.** REA/Ghidra oturumu henüz
-> yapılmadı. Aşağıdaki satırlar [DOK] ve [AJAN]'dır. [REA] satırlarını yalnızca gerçek
+> **Dürüst durum:** Şu an yalnızca **artefakt düzeyinde** [REA] satırları var (hash, PE biçimi, kaynak ağacı). **Algoritma
+> hakkında [REA] kanıtı yok**: Ghidra bu makinede yapılandırılmadığı için hesap motoru henüz incelenemedi. Aşağıdaki satırlar [DOK] ve [AJAN]'dır. [REA] satırlarını yalnızca gerçek
 > bir inceleme oturumunun bulgularıyla sen dolduracaksın; uydurma kanıt eklenmez.
 
 ## A) [DOK] satırları (kaynak sayfa numarasını kendin ekle)
@@ -33,13 +33,14 @@ referansı zorunlu) · **[AJAN]** ajanın çıkarımı, kanıtı yok. Puan yaln�
 | L11 / H-06 | N için üst sınır var | [AJAN] | yok | Düşük | çok küçük f |
 | L12 | çıktı 4 basamağa yuvarlanır | [AJAN] | yok | Düşük | ekranda gösterilen basamak sayısına göre güncelle |
 
-## C) [REA] satırları (BOŞ: Oturum 1 doldurur)
+## C) [REA] satırları (şimdilik yalnızca artefakt düzeyi; algoritma satırlarını Ghidra'lı Oturum 1 doldurur)
 
 | # | İddia | Etiket | REA kanıtı (fonksiyon adresi / dize ref.) | Güven | Bilinmeyen |
 |---|---|---|---|---|---|
-| R1 | | [REA] | | | |
-| R2 | | [REA] | | | |
-| … | | | | | |
+| R1 | `GPowerNT.exe`: PE biçimi, x86, SHA-256 `c63e6a133eb6372932f810c08cc33dc35a06d1ddb658f897bd6c34a754efc812` | [REA] (artefakt düzeyi) | `open_binary` (REA 6.5.0), C:\Users\ferha\Desktop\GPowerWin_3.1.9.7\GPower_3.1.9.7_143\GPowerNT.exe | Yüksek | Algoritma hakkında bilgi vermez; Ghidra yok |
+| R2 | Kaynak ağacı (toplam 144 kaynak, tarama tamam, makine 0x14C = x86): 89 RT_DIALOG, 18 RT_ICON, 10 RT_STRING, 6 RT_MENU, 2 RT_BITMAP, 2 RT_GROUP_ICON, 1 RT_ACCELERATOR, 1 RT_VERSION, 1 RT_MANIFEST ve iki özel tip (240: 13, 241: 1) | [REA] (artefakt düzeyi) | `inspect_pe_resources`, kanıt kimliği `ev_8f2d8e77b0d0b8fff53b231e9586860677e8f1a0686462bf618de876b4e3b0d8` (authority: shipped-artifact, confidence: observed) | Yüksek | Yük içerikleri opak; sürüm dizeleri çözülmedi |
+| R3 | Arayüz yerel Win32 iletişim kutusu kaynaklarıyla kurulmuş (Delphi/.NET değil, büyük olasılıkla C++/MFC tarzı); Ghidra x86 PE'yi destekler | [AJAN] | R2'den çıkarım (`IDR_ICON3` adlandırması MFC/Visual C++ geleneğidir) | Orta | Derleyici/çerçeve doğrulanmadı; Ghidra ile teyit |
+| R4+ | *(algoritma satırları Ghidra kurulunca)* | | | | |
 
 Bulunması gereken ilk üç şey: (1) N arama döngüsünün başlangıcı, artışı ve çıkış koşulu,
 (2) N'nin k katına yuvarlanıp yuvarlanmadığı, (3) geçersiz girdi doğrulama dalları ve hata dizeleri.

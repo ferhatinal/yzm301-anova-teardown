@@ -79,7 +79,9 @@ dağılım çağrılarını NaN'a karşı korur; `cli.py` yalnızca argüman ayr
 
 ## Sürüm / konfigürasyon yönetimi
 - İncelenen yazılım: G\*Power **3.1.9.7 (Windows)**, yalnızca resmi sayfadan: psychologie.hhu.de
-- `GPower.exe` SHA-256: `TODO: sha256sum GPower.exe çıktısını buraya yaz`
+- İncelenen dosya: `GPowerNT.exe` (klasör: `GPowerWin_3.1.9.7\GPower_3.1.9.7_143`; ödevde "GPower.exe" olarak anılıyor)
+- SHA-256: `c63e6a133eb6372932f810c08cc33dc35a06d1ddb658f897bd6c34a754efc812` (REA `open_binary` ile hesaplandı; biçim PE, mimari x86)
+- Sürüm teyidi: sürüm bilgisi şimdilik yalnızca klasör adından (3.1.9.7). Dosyada RT_VERSION kaynağı var ama REA alanları çözmüyor; Dosya özellikleri → Ayrıntılar sekmesinden teyit et.
 - `GPower.exe` repoya konmaz (`.gitignore`).
 - Demo videosu (60 sn, CLI): `TODO`
 - REA ve ajan kurulum kontrol çıktısı (ekran görüntüsü): `TODO`
