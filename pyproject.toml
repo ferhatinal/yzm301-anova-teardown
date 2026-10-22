@@ -11,9 +11,13 @@ dependencies = ["scipy>=1.10"]
 
 [project.optional-dependencies]
 test = ["statsmodels>=0.14"]
+mcp = ["mcp>=2"]
+agent = ["anthropic>=1"]
+all = ["statsmodels>=0.14", "mcp>=2", "anthropic>=1"]
 
 [project.scripts]
 gpower-clone = "powerlab.cli:main"
+powerlab-mcp = "powerlab.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
