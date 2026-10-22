@@ -1,5 +1,14 @@
 # YAPILACAKLAR: kalan işler (yalnızca senin bilgisayarında yapılabilenler)
 
+## Güncel durum (23 Ekim, gece)
+- ✅ GitHub: https://github.com/ferhatinal818-creator/yzm301-anova-teardown (main, 4 commit pushlandı)
+- ✅ G\*Power dosyası bulundu, SHA-256 README'de
+- 🟨 Ghidra: `GHIDRA_INSTALL_DIR` ayarlı (Ghidra 12.2) ama REA sunucusu bunu henüz görmüyor. REA 12.1.x istiyor;
+  12.2 kabul edilmezse 12.1.x indirip `GHIDRA_INSTALL_DIR`'i ona çevir. Ortam değişkeni değişince Claude Desktop'u
+  tamamen kapatıp (sistem tepsisinden Çık) yeniden aç. Ayrıca `java -version` çıktısı 21 olmalı.
+- ⬜ G\*Power GUI vektörleri (≥30), REA algoritma incelemesi, demo videosu, canlı ajan ölçümü
+
+
 Kod, testler, belge şablonları, MCP, ajan ve kılavuz kâhini hazır (`README.md` durum tablosu).
 Aşağıdakiler G\*Power'ın kendisine veya senin hesaplarına bağlı olduğu için uzaktan yapılamadı.
 Sırayla yaparsan toplam ~1,5–2 saat. En çok puan getiren: **2 ve 3**.
