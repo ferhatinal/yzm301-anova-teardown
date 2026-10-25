@@ -36,3 +36,6 @@ varsayım k=3'te yanlış demektir: kaydı buraya yaz. 159 çıkarsa burada kay�
 - **İddia (benim, [AJAN], kanıtsız):** grup başına en az 2 gözlem (`MIN_PER_GROUP=2`, H-03) ve `power = alpha` hata (H-05).
 - **Binary (R5, R6):** doğrulayıcılar yalnızca k < N ve alpha ≤ power istiyor; grup başına 2 koşulu ve power=alpha reddi bulunmadı.
 - **Durum:** kodu henüz değiştirmedim; GUI vektörleriyle (post hoc k=3, N=4; power=alpha) sınanacak, sonra motor düzeltilecek.
+
+## H-C notu (güncelleme)
+R27 (yuvarlama `ceil(N/k)·k`) H-07'yi destekliyor. `MIN_PER_GROUP=2` ise a priori'de alt sınır (R28: k + sabit) bir katına yuvarlandığında KENDİLİĞİNDEN ortaya çıkabilir; sabit değeri okunana kadar hüküm verilmiyor. Post hoc'ta ise yalnızca N > k aranıyor (R5).
