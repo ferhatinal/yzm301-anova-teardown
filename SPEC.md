@@ -1,86 +1,93 @@
-# SPEC.md: F testi, tek yönlü ANOVA (güç analizi)
+# SPEC.md (v1): F testi, tek yönlü sabit etkili ANOVA (omnibus), G*Power 3.1.9.7 davranışı
 
-> **DURUM: TASLAK (v0, [DOK] baz çizgisi).** Bu belge REA oturumundan ÖNCE, yalnızca kılavuz/teori
-> bilgisiyle yazıldı. "HIPOTEZ" etiketli senaryolar kanıtlanmış davranış DEĞİLDİR. Oturum 1 (REA)
-> bunları `[REA]` kanıtıyla doğrular, düzeltir veya siler; ardından Oturum 2 yalnızca nihai
-> SPEC.md ile başlar. Her senaryonun bağlı olduğu satır LEDGER.md'dedir.
+> Bu belge Oturum 2'nin (temiz oda yazımı) TEK girdisidir. Burada decompile kodu yoktur; yalnızca davranış,
+> formüller ve kabul senaryoları vardır. Her senaryonun yanındaki `[Rn]` kodu `LEDGER.md` satırına bağlar.
+> Etiketler: [REA] = binary'den (Ghidra, adres LEDGER'da), [DOK] = kılavuz, [AJAN] = çıkarım, [BİLİNMİYOR].
 
-Terimler: `f` Cohen etki büyüklüğü, `k` grup sayısı (`groups`), `N` toplam örneklem.
+## 1. Kapsam
+Test: "ANOVA: Fixed effects, omnibus, one-way" ([R17], [R29]). Analiz türleri:
+- **a priori**: girdi f, alpha, power, k (grup sayısı) → çıktı toplam N ve türevleri.
+- **post hoc**: girdi f, alpha, k, N (toplam) → çıktı power ve türevleri.
 
-## Özellik 1: Güç hesabı (post hoc)  [DOK]
+(G*Power'da sensitivity/criterion/compromise de vardır; bu ödevin kapsamı değildir.)
 
-```gherkin
-Senaryo: df ve merkezsel olmama parametresi            # LEDGER L1, L2
-  Diyelim ki f=0.25, alpha=0.05, groups=3, n_total=159
-  Eğer post-hoc modu çalıştırılırsa
-  O zaman df1=2 ve df2=156
-  Ve ncp = f² × n_total = 9.9375
+## 2. Formüller
+Tüm sayılar IEEE çift duyarlıktır.
 
-Senaryo: kritik F                                       # LEDGER L3
-  Diyelim ki f=0.25, alpha=0.05, groups=3, n_total=159
-  Eğer post-hoc modu çalıştırılırsa
-  O zaman critical, F dağılımının (df1, df2) için (1 - alpha) kuantilidir (≈ 3.054)
+- df1 = k − 1; df2 = N − k [R26]. N a priori'nin arama aşamasında gerçek sayı olabilir.
+- Merkezsel olmama: λ = f² · N [R25].
+- Kritik F: **merkezsel** F dağılımının (λ = 0, df1, df2) (1 − alpha) kuantili [R19].
+- Güç: 1 − P(F′ ≤ F_kritik), F′ ~ merkezsel olmayan F(df1, df2, λ) [R19]. λ < 1e-10 ise merkezsel F kullanılır, yani f = 0 iken güç = alpha [R14, R32].
+- Merkezsel olmayan F CDF, λ/2 ortalamalı Poisson ağırlıklı eksik-beta toplamıyla hesaplanır (CDFLIB `cumfnc` benzeri) [R24, R32]. Durdurma eşikleri 1e-20 ve 1e-13 [R32]. Standart bir tam-doğru uygulama (örn. scipy `ncf`, dikkat: bazı sürümlerde `nct.cdf` NaN verebilir; yedek yol gerekir) kabul edilir, farklar N'yi değiştirmemelidir.
 
-Senaryo: güç, merkezsel olmayan F kuyruk olasılığıdır   # LEDGER L4
-  Diyelim ki f=0.25, alpha=0.05, groups=3, n_total=159
-  O zaman actual_power = P(F'(df1, df2, ncp) > critical) (≈ 0.8049)
-```
+## 3. A priori N algoritması [R21, R27, R28, R34, R35]
+1. Hedef güç P* = girilen power; alt sınır `lo = k + 1`.
+2. Güç(N) fonksiyonu, N gerçek sayı kabul edilerek (df2 = N − k, λ = f²N) artan ve süreklidir. N\* = güç(N) = P* denkleminin kökü (N ≥ lo). Güç(lo) ≥ P* ise N\* := lo.
+3. **N = ceil(N\* / k) · k** (k'nın katına yukarı yuvarlama).
+4. Çıktı güçleri N için yeniden hesaplanır (actual power), kritik F, df1, df2, λ de bu N içindir.
+5. Eşdeğer ifade: N, k'nın katı olan, **2k'dan küçük olmayan** ve güç(N) ≥ P* sağlayan **en küçük** sayıdır (kök bulucu duyarlığı sınırları dışında). En küçük olası N = 2k [R35] (grup başına en az 2).
+6. N üst sınırı: bilinmiyor. Kök bulucu üst sınırı gerektiği kadar büyütür; G*Power'ın sonlu bir sınırı veya "hesaplanamadı" iletisi olabilir ([BİLİNMİYOR], GUI ile sınanacak).
 
-## Özellik 2: Örneklem büyüklüğü (a priori)
+## 4. Post hoc [R19, R22, R26]
+- N, k'nın katı olmak ZORUNDA DEĞİL; güç doğrudan toplam N ile hesaplanır. (G*Power yalnızca bir uyarı verir: "total sample size is not a multiple of the number of groups; analysis based on the average group size.")
+- n_per_group yalnızca N k'ya bölünüyorsa tamsayıdır; aksi halde N/k (ortalama grup büyüklüğü) anlamındadır.
 
-```gherkin
-Senaryo: hedef gücü sağlayan en küçük N                 # LEDGER L5  [HIPOTEZ H-02]
-  Diyelim ki f=0.25, alpha=0.05, power=0.80, groups=3
-  Eğer a-priori modu çalıştırılırsa
-  O zaman actual_power >= 0.80 olan en küçük n_total döner
+## 5. Girdi doğrulaması (kapalı aralıklar) [R4–R8, R30, R36]
+| Girdi | Geçerli aralık | Hata iletisi (G*Power) |
+|---|---|---|
+| k | tamsayı, k ≥ 2 | "There must be at least 2 groups." |
+| f (a priori) | [1e-6, 50] | "... is outside the admissible range (1e-06, 50)" |
+| f (post hoc) | [0, 50] | aynı |
+| alpha | [1e-7, 0.9999999] | "Alpha is outside the admissible range (...)" |
+| power | [1e-7, 0.9999999] | "Power is outside the admissible range (...)" |
+| alpha ≤ power (a priori) | alpha ≤ power (eşitlik GEÇERLİ) | "Power must be greater than or equal to alpha." |
+| N (post hoc) | tamsayı, k < N (kesin) | "Sample size must be greater than the number of groups (k)" |
 
-Senaryo: N grup sayısının katıdır                       # LEDGER L6  [HIPOTEZ H-07]
-  Diyelim ki groups=3
-  O zaman n_total, 3'ün katıdır ve n_per_group = n_total / 3
-  # KANIT DURUMU: [DOK] kılavuz Örnek 10.3 (k=10, f=0.25, alpha=0.05, güç=0.95) N=390 verir;
-  # birer-artış arama 386 verirdi. Bu H-07'yi destekler ama TEK bir k için ([REA] veya GUI vektörü değil).
-  # k=3 için (158 mi 159 mu?) GUI vektörü hâlâ bekleniyor.
+CLI hata biçimi ödev sözleşmesindendir (tek satır JSON `{"error":...}`, sıfırdan farklı çıkış kodu); ileti metni sözleşmeye uyar, G*Power iletisini kelimesi kelimesine taşımak gerekmez.
 
-Senaryo: kılavuz örneği (basılı çıktı)                  # LEDGER L15  [DOK]
-  Diyelim ki f=0.25, alpha=0.05, power=0.95, groups=10
-  Eğer a-priori modu çalıştırılırsa
-  O zaman n_total=390 ve n_per_group=39
-  Ve df1=9, df2=380, ncp=24.375, critical=1.904538, actual_power=0.952363
-
-Senaryo: alt sınır                                      # LEDGER L7  [HIPOTEZ H-03]
-  Diyelim ki f çok büyük (ör. 5)
-  O zaman n_per_group en az 2'dir
-```
-
-## Özellik 3: Girdi doğrulama  [HIPOTEZ H-04/05/06/08, hepsi REA/kâhin bekliyor]
+## 6. Kabul senaryoları (Gherkin)
 
 ```gherkin
-Senaryo Taslağı: geçersiz girdi                         # LEDGER L8-L12
-  Örnekler:
-    | f   | alpha | power | groups | beklenen                       |
-    | 0   | 0.05  | 0.9   | 3      | hata                           |
-    | -1  | 0.05  | 0.9   | 3      | hata                           |
-    | 0.25| 0     | 0.9   | 3      | hata                           |
-    | 0.25| 1     | 0.9   | 3      | hata                           |
-    | 0.25| 0.05  | 0.05  | 3      | hata (HIPOTEZ: power <= alpha) |
-    | 0.25| 0.05  | 1     | 3      | hata                           |
-    | 0.25| 0.05  | 0.9   | 1      | hata (HIPOTEZ: groups >= 2)    |
-  O zaman çıktı {"error": "..."} ve çıkış kodu sıfırdan farklıdır
+Özellik: Tek yönlü ANOVA güç analizi
+
+  Senaryo: A priori toplam N, k'nın katıdır [R27, R35]
+    Diyelim ki f=0.25, alpha=0.05, power=0.80, k=3
+    Eğer a priori hesaplanırsa
+    O zaman n_total, 3'e tam bölünür
+    Ve actual_power ≥ 0.80
+    Ve n_total − 3 için (k'nın bir önceki katı) güç 0.80'in altındadır
+
+  Senaryo: Kılavuz örneği [DOK, L15]
+    Diyelim ki f=0.25, alpha=0.05, power=0.95, k=10
+    O zaman n_total = 390, actual_power ≈ 0.952363, critical ≈ 1.904538, df1=9, df2=380, ncp=24.375
+
+  Senaryo: En küçük N 2k'dır [R35]
+    Diyelim ki f=50, alpha=0.05, power=0.80, k=4
+    O zaman n_total = 8
+
+  Senaryo: Post hoc güç k'nın katı olmayan N ile hesaplanır [R22]
+    Diyelim ki f=0.25, alpha=0.05, k=3, n_total=100
+    O zaman hata yoktur ve güç, df1=2, df2=97, ncp=6.25 ile hesaplanır
+
+  Senaryo: f=0 iken post hoc güç alpha'ya eşittir [R14, R32]
+    Diyelim ki f=0, alpha=0.05, k=3, n_total=30
+    O zaman actual_power = 0.05
+
+  Senaryo: power = alpha geçerlidir [R6]
+    Diyelim ki f=0.25, alpha=0.05, power=0.05, k=3
+    O zaman hata yoktur ve n_total = 6 (en küçük N)
+
+  Senaryo: Geçersiz girdiler [R4, R5, R6, R30]
+    k=1 → hata
+    post hoc, k=3, n_total=3 → hata
+    a priori, power=0.04, alpha=0.05 → hata
+    f=0 (a priori) → hata; f=51 → hata
+    alpha=0 veya alpha=1 → hata
 ```
 
-## Özellik 4: Arayüz sözleşmesi
-
-```gherkin
-Senaryo: tek satır JSON                                 # LEDGER L13  [DOK: ödev metni]
-  Eğer komut başarılı olursa
-  O zaman stdout tek satırlık JSON'dur ve çıkış kodu 0'dır
-  Ve alan adları CONTRACT.md'ye uyar (şimdilik VARSAYIM: n_per_group, n_total, actual_power,
-     critical, df1, df2, ncp)
-
-Senaryo: motor tektir                                   # LEDGER L14  [DOK: Sommerville, katmanlı mimari]
-  O zaman CLI (ve varsa MCP/REST) hesap yapmaz; yalnızca engine.compute çağırır
-```
-
-## Çözülmesi gereken bilinmeyenler (Oturum 1 hedefi)
-H-01 (yalnızca t2 referansı), H-02 durma koşulu, H-03 alt sınırlar, H-05 power<=alpha, H-06 üst sınır,
-H-07 N'nin k katına yuvarlanması, H-08 groups alt/üst sınırı, çıktı basamak sayıları.
+## 7. Bilinmeyenler (diferansiyel/GUI testi gerekir)
+1. Çıktıların ekranda/yuvarlanmış gösterim basamakları (güç, kritik F, ncp). CLI sözleşmesi 4 basamak varsayar [AJAN].
+2. N üst sınırı ve "hesaplanamadı" davranışı (çok küçük f).
+3. Kök işlevinin tam tanımı (`FUN_00496830`) güç(N) − P* olduğu varsayımıdır [AJAN]; sonuç eşdeğerliği GUI vektörleriyle (özellikle N\* tam bir katın hemen yanındayken) doğrulanmalı.
+4. k için üst sınır (G*Power GUI'si bir üst sınır koyuyor olabilir).
+5. n_per_group alanının N k'ya bölünmediğinde çıktıda nasıl gösterileceği (CLI sözleşmesi).
