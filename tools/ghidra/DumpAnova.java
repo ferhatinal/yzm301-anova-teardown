@@ -17,6 +17,7 @@ public class DumpAnova extends GhidraScript {
     File out = new File(a.length > 1 ? a[1] : System.getProperty("user.home") + "\\gpower_dump");
     out.mkdirs();
     if (mode.equals("strings")) dumpStrings(out);
+    else if (mode.equals("vtable")) vtables(out, a.length > 2 ? a[2] : "");
     else if (mode.equals("doubles")) doubles(out, a.length > 2 ? a[2] : "");
     else decomp(out, a.length > 2 ? a[2] : "");
   }
@@ -44,6 +45,40 @@ public class DumpAnova extends GhidraScript {
       }
       println("strings written: " + n);
     }
+  }
+
+  void vtables(File out, String list) throws Exception {
+    ghidra.program.model.mem.Memory mem = currentProgram.getMemory();
+    try (PrintWriter w = new PrintWriter(new File(out, "vtables.txt"), "UTF-8")) {
+      for (String t : list.split(",")) {
+        t = t.trim();
+        if (t.isEmpty()) continue;
+        Address f = toAddr(t);
+        w.println("=== function " + t);
+        for (Reference r : getReferencesTo(f)) {
+          Address from = r.getFromAddress();
+          Data d = getDataContaining(from);
+          if (d == null) { w.println("code ref from " + from); continue; }
+          // scan back for a label containing 'vftable' (RTTI) or the start of the pointer run
+          Address base = from;
+          for (int i = 0; i < 0x400; i += 4) {
+            Address a = from.subtract(i);
+            ghidra.program.model.symbol.Symbol s = currentProgram.getSymbolTable().getPrimarySymbol(a);
+            if (s != null && s.getName().toLowerCase().contains("vftable")) { base = a; break; }
+          }
+          w.println("data ref from " + from + " ; table base guess " + base + " ; slot byte offset " + from.subtract(base));
+          for (int i = 0; i < 0x200; i += 4) {
+            Address a = base.add(i);
+            long v = mem.getInt(a) & 0xffffffffL;
+            Address tgt = toAddr(Long.toHexString(v));
+            Function fn = tgt == null ? null : getFunctionAt(tgt);
+            ghidra.program.model.symbol.Symbol s = currentProgram.getSymbolTable().getPrimarySymbol(a);
+            w.println(String.format("%s +0x%03x -> %08x %s %s", a, i, v, fn == null ? "-" : "FUNC", s == null ? "" : s.getName()));
+          }
+        }
+      }
+    }
+    println("vtables written");
   }
 
   void doubles(File out, String list) throws Exception {
