@@ -31,3 +31,8 @@ ajanın iddiası · nasıl fark ettin · hangi test/vektör yakaladı · düzelt
 *Aday: H-07 (N, k katına yuvarlanıyor mu?). Kılavuz Örnek 10.3 (k=10) hipotezi destekledi (390, 386 değil),
 dolayısıyla ihtimal düştü. Yine de G\*Power ekranından f=.25, α=.05, güç=.80, k=3 için 158 çıkarsa
 varsayım k=3'te yanlış demektir: kaydı buraya yaz. 159 çıkarsa burada kayıt gerekmez.*
+
+## H-C (ajan varsayımı, binary ile çelişiyor: ek doğrulama bekliyor)
+- **İddia (benim, [AJAN], kanıtsız):** grup başına en az 2 gözlem (`MIN_PER_GROUP=2`, H-03) ve `power = alpha` hata (H-05).
+- **Binary (R5, R6):** doğrulayıcılar yalnızca k < N ve alpha ≤ power istiyor; grup başına 2 koşulu ve power=alpha reddi bulunmadı.
+- **Durum:** kodu henüz değiştirmedim; GUI vektörleriyle (post hoc k=3, N=4; power=alpha) sınanacak, sonra motor düzeltilecek.

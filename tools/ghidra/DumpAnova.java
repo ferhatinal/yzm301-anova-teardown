@@ -17,6 +17,7 @@ public class DumpAnova extends GhidraScript {
     File out = new File(a.length > 1 ? a[1] : System.getProperty("user.home") + "\\gpower_dump");
     out.mkdirs();
     if (mode.equals("strings")) dumpStrings(out);
+    else if (mode.equals("doubles")) doubles(out, a.length > 2 ? a[2] : "");
     else decomp(out, a.length > 2 ? a[2] : "");
   }
 
@@ -43,6 +44,19 @@ public class DumpAnova extends GhidraScript {
       }
       println("strings written: " + n);
     }
+  }
+
+  void doubles(File out, String list) throws Exception {
+    try (PrintWriter w = new PrintWriter(new File(out, "doubles.txt"), "UTF-8")) {
+      for (String t : list.split(",")) {
+        t = t.trim();
+        if (t.isEmpty()) continue;
+        Address ad = toAddr(t);
+        long bits = currentProgram.getMemory().getLong(ad);
+        w.println(t + "\t" + Double.longBitsToDouble(bits) + "\t0x" + Long.toHexString(bits));
+      }
+    }
+    println("doubles written");
   }
 
   void decomp(File out, String list) throws Exception {
