@@ -6,6 +6,6 @@ set "PROJ=%USERPROFILE%\gpower_ghidra"
 set "OUT=%USERPROFILE%\gpower_dump"
 mkdir "%PROJ%" 2>nul
 mkdir "%OUT%" 2>nul
-call "%GHIDRA_INSTALL_DIR%\support\analyzeHeadless.bat" "%PROJ%" GPower -import "%EXE%" -overwrite -scriptPath "%~dp0" -postScript DumpAnova.java strings "%OUT%"
+call "%GHIDRA_INSTALL_DIR%\support\analyzeHeadless.bat" "%PROJ%" GPower -import "%EXE%" -overwrite -scriptPath "%~dp0." -postScript DumpAnova.java strings "%OUT%"
 echo.
 echo BITTI. Dosya: %OUT%\strings_xrefs.tsv
