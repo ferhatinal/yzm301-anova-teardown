@@ -5,7 +5,7 @@ import ghidra.app.decompiler.*;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.listing.*;
 import ghidra.program.model.symbol.Reference;
-import ghidra.program.util.DefinedDataIterator;
+import ghidra.program.model.data.AbstractStringDataType;
 import java.io.*;
 import java.util.*;
 
@@ -24,7 +24,10 @@ public class DumpAnova extends GhidraScript {
     try (PrintWriter w = new PrintWriter(new File(out, "strings_xrefs.tsv"), "UTF-8")) {
       w.println("string_addr\tref_from\tfunc_entry\tstring");
       int n = 0;
-      for (Data d : DefinedDataIterator.definedStrings(currentProgram)) {
+      DataIterator dit = currentProgram.getListing().getDefinedData(true);
+      while (dit.hasNext()) {
+        Data d = dit.next();
+        if (!(d.getDataType() instanceof AbstractStringDataType)) continue;
         Object v = d.getValue();
         String s = v == null ? "" : v.toString().replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
         if (s.length() < 3) continue;
