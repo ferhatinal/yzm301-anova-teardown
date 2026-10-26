@@ -71,8 +71,8 @@ class ErrorContract(unittest.TestCase):
     def test_foreign_param(self):
         self.assert_error(2, *self.base, "--d", "0.5", "--f", "0.25", "--groups", "3", "--alpha", "0.05", "--power", "0.9")
 
-    def test_power_not_above_alpha(self):
-        self.assert_error(2, *self.base, "--f", "0.25", "--groups", "3", "--alpha", "0.05", "--power", "0.05")
+    def test_power_below_alpha(self):
+        self.assert_error(2, *self.base, "--f", "0.25", "--groups", "3", "--alpha", "0.05", "--power", "0.04")
 
     def test_unknown_family(self):
         self.assert_error(3, "--test", "nope", "--mode", "a-priori")

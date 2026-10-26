@@ -181,10 +181,19 @@ class Boundaries(unittest.TestCase):
             with self.assertRaises(InputError):
                 A.a_priori(0.25, 0.05, p, 3)
 
-    def test_power_not_above_alpha_h05(self):
-        for p in (0.05, 0.01):
+    def test_power_below_alpha_rejected_r6(self):
+        for p in (0.04, 0.01):
             with self.assertRaises(InputError):
                 A.a_priori(0.25, 0.05, p, 3)
+
+    def test_power_equal_alpha_valid_r6(self):  # [REA] R6: esitlik gecerli
+        self.assertEqual(A.a_priori(0.25, 0.05, 0.05, 3).n_total, 6)
+
+    def test_bounds_r30_r36(self):
+        for args in ((0.25, 0.0, 0.8, 3), (0.25, 1.0, 0.99, 3), (51, 0.05, 0.8, 3), (0, 0.05, 0.8, 3)):
+            with self.assertRaises(InputError):
+                A.a_priori(*args)
+        self.assertAlmostEqual(A.post_hoc(0, 0.05, 3, 30).actual_power, 0.05, places=6)
 
     def test_post_hoc_n_total_must_exceed_groups(self):
         for n in (3, 2, 0, -5):

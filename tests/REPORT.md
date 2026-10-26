@@ -41,3 +41,8 @@ Bu katman bir hatayı yakaladı: `scipy.stats.nct.cdf` NaN (bkz. HALLUCINATIONS.
 ## 4) Sınırlar
 Bu rapor G*Power ile eşleşmeyi KANITLAMAZ. Yalnızca motorun kütüphane teorisiyle tutarlı olduğunu ve
 hipotezlerin açıkça ayrıldığını gösterir. Testler hataların varlığını gösterebilir, yokluğunu değil.
+
+
+## Güncelleme (R34-R36 sonrası)
+- Motor [REA] bulgularına hizalandı: power == alpha geçerli (R6), alpha/power [1e-7, 0.9999999] (R36), f a priori [1e-6, 50], post hoc [0, 50] (R30).
+- 66 test geçiyor. Temiz oda motoru (`cleanroom/`) ile 1080 vektörde 0 N farkı; bu G*Power kanıtı değildir.

@@ -49,13 +49,19 @@ class AnovaResult:
         }
 
 
-def _check(f, alpha, groups):
+LO_PROB, HI_PROB = 1e-7, 0.9999999     # [REA] LEDGER R36
+F_MAX = 50.0                           # [REA] R30
+F_MIN_A_PRIORI = 1e-6                  # [REA] R30
+
+
+def _check(f, alpha, groups, a_priori=True):
     if not isinstance(groups, int) or isinstance(groups, bool) or groups < MIN_GROUPS:
-        raise InputError(f"groups en az {MIN_GROUPS} olan bir tam sayı olmalı")
-    if not math.isfinite(f) or f <= 0:
-        raise InputError("f sonlu ve sıfırdan büyük olmalı")
-    if not (0 < alpha < 1):
-        raise InputError("alpha (0,1) aralığında olmalı")
+        raise InputError("There must be at least 2 groups (groups tam sayı >= 2 olmalı)")
+    lo = F_MIN_A_PRIORI if a_priori else 0.0
+    if not math.isfinite(f) or f < lo or f > F_MAX:
+        raise InputError(f"f [{lo:g}, {F_MAX:g}] aralığında olmalı")
+    if not (math.isfinite(alpha) and LO_PROB <= alpha <= HI_PROB):
+        raise InputError("alpha [1e-7, 0.9999999] aralığında olmalı")
 
 
 def anova_power(f: float, alpha: float, groups: int, n_total: int):
@@ -74,10 +80,10 @@ def anova_power(f: float, alpha: float, groups: int, n_total: int):
 
 def a_priori(f: float, alpha: float, power: float, groups: int) -> AnovaResult:
     _check(f, alpha, groups)
-    if not (0 < power < 1):
-        raise InputError("power (0,1) aralığında olmalı")
-    if power <= alpha:
-        raise InputError("power, alpha değerinden büyük olmalı")  # HIPOTEZ H-05
+    if not (math.isfinite(power) and LO_PROB <= power <= HI_PROB):
+        raise InputError("power [1e-7, 0.9999999] aralığında olmalı")
+    if power < alpha:
+        raise InputError("Power must be greater than or equal to alpha")  # [REA] R6
 
     def total(m: int) -> int:          # m. aday toplam N (m = 1, 2, 3, ...)
         if ROUND_TO_MULTIPLE_OF_GROUPS:
@@ -115,7 +121,7 @@ def a_priori(f: float, alpha: float, power: float, groups: int) -> AnovaResult:
 
 
 def post_hoc(f: float, alpha: float, groups: int, n_total: int) -> AnovaResult:
-    _check(f, alpha, groups)
+    _check(f, alpha, groups, a_priori=False)
     if not isinstance(n_total, int) or isinstance(n_total, bool) or n_total <= groups:
         raise InputError("n_total, groups değerinden büyük bir tam sayı olmalı")  # HIPOTEZ H-03
     pw, crit, df1, df2, ncp = anova_power(f, alpha, groups, n_total)
