@@ -22,15 +22,17 @@ Bu dosyaya yalnızca gerçekten yaşananlar yazılır.
 - **Ders:** "Tip güvenliği doğruluk değildir." NaN, sessiz hata kaynağıdır. Bağımsız ikinci bir
   kâhin olmasaydı bu hata G*Power vektörü toplanana kadar fark edilmeyebilirdi.
 
-## H-B  (SENİN DOLDURMAN GEREKİYOR) REA oturumunda ajanın yanlış çıkardığı ikinci şey
+## H-B  (YAŞANDI) Ajan kaynak sayılarını ve kanıt satırlarını doğrulamadan yazdı
 
-*Boş. Oturum 1'de ajanın kanıtsız veya yanlış bir iddiası olursa (örn. "döngü >= ile duruyor"
-deyip kod izi gösterememesi, ya da N yuvarlamasını yanlış yorumlaması) buraya şu başlıklarla yaz:
-ajanın iddiası · nasıl fark ettin · hangi test/vektör yakaladı · düzeltme.*
-
-*Aday: H-07 (N, k katına yuvarlanıyor mu?). Kılavuz Örnek 10.3 (k=10) hipotezi destekledi (390, 386 değil),
-dolayısıyla ihtimal düştü. Yine de G\*Power ekranından f=.25, α=.05, güç=.80, k=3 için 158 çıkarsa
-varsayım k=3'te yanlış demektir: kaydı buraya yaz. 159 çıkarsa burada kayıt gerekmez.*
+- **Ajanın yanlışı:** LEDGER R2'de PE kaynak sayıları RT_STRING ve RT_MENU için yer değiştirmiş yazıldı; ayrıca bazı
+  R satırları (R7, R14, R26, R30, R32) sabit değerlerini, ilgili `doubles.txt` okunmadan "değer" olarak taşıdı.
+  Daha önce de dokümana belleğe dayalı "159/252/280" sayıları girmişti.
+- **Nasıl fark edildi:** kaynak ağacı yapısından yeniden sayım (10 RT_STRING, 6 RT_MENU, 89 RT_DIALOG, toplam 144);
+  bellek sayıları kılavuzdaki Örnek 10.3 ile karşılaştırılınca kanıtsız olduğu için silindi.
+- **Hangi kontrol yakaladı:** yeniden sayım ve "yalnızca [REA] etiketli kanıt" kuralı; sabitler `doubles.txt` ile eşlendi.
+- **Düzeltme:** R2 sayıları düzeltildi, bellek kaynaklı sayılar kaldırıldı.
+- **Ek kayıt:** REA Ghidra sağlayıcısı sorununu önce kullanıcı hatası sandım (yanlış `scriptPath` tanısı da); ortam
+  değişkeni, yeniden başlatma ve config sonrası da aynı hata sürünce sağlayıcı sorunu olarak kabul edildi.
 
 ## H-C (ajan varsayımı, binary ile çelişiyor: ek doğrulama bekliyor)
 - **İddia (benim, [AJAN], kanıtsız):** grup başına en az 2 gözlem (`MIN_PER_GROUP=2`, H-03) ve `power = alpha` hata (H-05).

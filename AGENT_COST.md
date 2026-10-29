@@ -6,8 +6,8 @@
 | Oturum | Ajan / model | Görev | Yaklaşık token | Yaklaşık maliyet | İterasyon |
 |---|---|---|---|---|---|
 | 0: iskelet | Claude Sonnet 5.5 (claude.ai) | CLI + motor + test iskeleti ([DOK] baz çizgisi, REA'dan önce) | *ölç* | *ölç* | 3 (aşağıya bak) |
-| 1: inceleme | *(Claude Code / Codex / ...)* | REA + Ghidra, SPEC.md + LEDGER.md | | | |
-| 2: yazım | *(yeni oturum)* | yalnızca SPEC.md ile yeniden yazım | | | |
+| 1: inceleme | Claude Sonnet 5.5 (Claude Code oturumu) | Ghidra headless decompile turları, SPEC.md v1 + LEDGER R1–R36 | *ölçülmedi (panelden alınacak)* | *ölçülmedi* | ~8 decompile turu |
+| 2: yazım | Claude alt ajanı (temiz oda) | yalnızca SPEC.md ile `anova_clean.py` | ~70k token (alt ajan raporu, 5 araç çağrısı, ~46 sn) | *ölçülmedi* | 1 |
 
 ## Oturum 0 iterasyonları (gerçekte olanlar)
 1. t2-indep referansıyla motor + CLI: sözleşme örneğini birebir verdi.

@@ -87,9 +87,17 @@ dağılım çağrılarını NaN'a karşı korur; `cli.py` yalnızca argüman ayr
 - REA ve ajan kurulum kontrol çıktısı (ekran görüntüsü): `TODO`
 
 ## Süreç beyanı
-İlk motor, REA incelemesinden önce, yalnızca kılavuz/teori bilgisiyle ve decompile çıktısı
-görmeden yazıldı ([DOK] baz çizgisi). Bu iskeletin nasıl kullanıldığını (test düzeneği /
-başlangıç kodu) burada belirt: `TODO`. İki oturum ayrımı için `prompts/` klasörüne bak.
+1. **İskelet (Oturum 0):** REA'dan önce, yalnızca kılavuz/teori ile, decompile görmeden yazıldı ([DOK] baz çizgisi).
+   Burada **test düzeneği ve CLI/MCP/ajan adaptörleri** olarak kullanıldı; hesap çekirdeği olarak değil.
+2. **İnceleme (Oturum 1):** Ghidra 12.1.4 headless ile `GPowerNT.exe`; bulgular `LEDGER.md` (R1–R36, adres referanslı),
+   davranış özeti `SPEC.md` v1 (decompile kodu içermez). REA'nın kendi Ghidra sağlayıcısı bu kurulumda yapılandırılamadı
+   (`GHIDRA_INSTALL_DIR` görülmedi); yalnızca R1–R2 REA aracıyla alındı, R4+ kullanıcı makinesinde çalıştırılan Ghidra betiğiyle.
+3. **Yazım (Oturum 2, temiz oda):** ayrı alt ajan yalnızca `SPEC.md` ve `cleanroom/TASK.md` ile
+   `cleanroom/anova_clean.py` yazdı. Hesap çekirdeği olarak `src/powerlab/families/_anova_clean.py` bu dosyanın değiştirilmemiş
+   kopyasıdır; `anova_oneway.py` yalnızca doğrulama ve arayüz katmanıdır. Yalıtım ajana talimatla sağlandı, teknik olarak zorlanmadı.
+4. **Sınır:** SPEC.md v1'i yazan oturum LEDGER'ı gördü ve iskeleti de yazan aynı ajandır; temiz oda yalnızca Oturum 2'yi kapsar.
+5. **Kâhin:** G\*Power GUI vektörleri henüz toplanmadı (`oracle/gpower_anova-oneway.csv` boş); kılavuz Örnek 10.3 (N=390) ve
+   kütüphane kâhini (600 vektör) elde var. %90 N-eşleşme kapısı GUI vektörleri olmadan ÖLÇÜLMEDİ.
 
 ## Yazarlara atıf
 - Faul, F., Erdfelder, E., Lang, A.-G., & Buchner, A. (2007). G\*Power 3: A flexible statistical

@@ -78,51 +78,30 @@ def anova_power(f: float, alpha: float, groups: int, n_total: int):
     return power, crit, df1, df2, ncp
 
 
+# --- Nihai hesap: temiz oda oturumunun (yalniz SPEC.md'den yazilan) modulu ---------------
+# `_anova_clean.py` degistirilmeden kopyalandi (cleanroom/anova_clean.py ile ayni). Yukaridaki
+# `anova_power` ve sabitler iskeletten kalma referanstir; testler onu ikinci yol olarak kullanir.
+from . import _anova_clean as _clean
+
+
+def _wrap(groups, d):
+    return AnovaResult(groups, int(d["n_total"]), float(d["actual_power"]), float(d["critical"]),
+                       int(d["df1"]), int(d["df2"]), float(d["ncp"]))
+
+
 def a_priori(f: float, alpha: float, power: float, groups: int) -> AnovaResult:
-    _check(f, alpha, groups)
-    if not (math.isfinite(power) and LO_PROB <= power <= HI_PROB):
-        raise InputError("power [1e-7, 0.9999999] aralığında olmalı")
-    if power < alpha:
-        raise InputError("Power must be greater than or equal to alpha")  # [REA] R6
-
-    def total(m: int) -> int:          # m. aday toplam N (m = 1, 2, 3, ...)
-        if ROUND_TO_MULTIPLE_OF_GROUPS:
-            return groups * (MIN_PER_GROUP + m - 1)
-        return groups + m              # n_total = groups + 1, groups + 2, ...
-
-    def reached(m: int) -> bool:
-        return anova_power(f, alpha, groups, total(m))[0] >= power
-
-    # HIPOTEZ H-02: koşulu sağlayan ilk (en küçük) N; üstel + ikili arama, ardından
-    # küçük pencerede yeniden doğrulama.
-    lo = 1
-    if reached(lo):
-        m = lo
-    else:
-        hi = 2
-        while not reached(hi):
-            lo, hi = hi, hi * 2
-            if total(hi) > MAX_TOTAL:
-                raise InputError("gerekli örneklem büyüklüğü sınırı aşıyor")
-        while hi - lo > 1:
-            mid = (lo + hi) // 2
-            if reached(mid):
-                hi = mid
-            else:
-                lo = mid
-        m = hi
-        for cand in range(max(1, m - 10), m):
-            if reached(cand):
-                m = cand
-                break
-    n_total = total(m)
-    pw, crit, df1, df2, ncp = anova_power(f, alpha, groups, n_total)
-    return AnovaResult(groups, n_total, pw, crit, df1, df2, ncp)
+    _check(f, alpha, groups)   # tip/aralik on denetimi (InputError); gerisi temiz oda modulunde
+    try:
+        return _wrap(groups, _clean.a_priori(f, alpha, power, groups))
+    except ValueError as e:
+        raise InputError(str(e)) from e
 
 
 def post_hoc(f: float, alpha: float, groups: int, n_total: int) -> AnovaResult:
     _check(f, alpha, groups, a_priori=False)
     if not isinstance(n_total, int) or isinstance(n_total, bool) or n_total <= groups:
-        raise InputError("n_total, groups değerinden büyük bir tam sayı olmalı")  # HIPOTEZ H-03
-    pw, crit, df1, df2, ncp = anova_power(f, alpha, groups, n_total)
-    return AnovaResult(groups, n_total, pw, crit, df1, df2, ncp)
+        raise InputError("Sample size must be greater than the number of groups (k)")  # [REA] R5
+    try:
+        return _wrap(groups, _clean.post_hoc(f, alpha, groups, n_total))
+    except ValueError as e:
+        raise InputError(str(e)) from e

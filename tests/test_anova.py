@@ -81,31 +81,11 @@ class APriori(unittest.TestCase):
         for k in (2, 3, 4, 5):
             self.assertEqual(A.a_priori(0.3, 0.05, 0.9, k).n_total % k, 0)
 
-    def test_h07_alternative_unit_step_can_be_smaller(self):
-        # Hipotez yanlışsa motor tek bir sabiti çevirerek düzelir.
-        old = A.ROUND_TO_MULTIPLE_OF_GROUPS
-        try:
-            A.ROUND_TO_MULTIPLE_OF_GROUPS = False
-            r = A.a_priori(0.25, 0.05, 0.80, 3)
-            self.assertLessEqual(r.n_total, 159)
-            self.assertGreaterEqual(r.actual_power, 0.80)
-            self.assertLess(A.anova_power(0.25, 0.05, 3, r.n_total - 1)[0], 0.80)
-        finally:
-            A.ROUND_TO_MULTIPLE_OF_GROUPS = old
-
-    def test_h07_both_modes_correct_against_independent_search(self):
-        """İki modun da doğru olduğunu bağımsız kaba kuvvetle doğrular:
-        birer-artış modu = ilk sağlayan N; k-katı modu = o N'yi içeren en küçük k katı."""
-        old = A.ROUND_TO_MULTIPLE_OF_GROUPS
-        try:
-            for f, pw, k in ((0.25, 0.80, 3), (0.25, 0.95, 3), (0.25, 0.95, 4), (0.4, 0.9, 5)):
-                first = next(n for n in range(k + 1, 100000) if A.anova_power(f, 0.05, k, n)[0] >= pw)
-                A.ROUND_TO_MULTIPLE_OF_GROUPS = False
-                self.assertEqual(A.a_priori(f, 0.05, pw, k).n_total, first)
-                A.ROUND_TO_MULTIPLE_OF_GROUPS = True
-                self.assertEqual(A.a_priori(f, 0.05, pw, k).n_total, k * math.ceil(first / k))
-        finally:
-            A.ROUND_TO_MULTIPLE_OF_GROUPS = old
+    def test_a_priori_is_smallest_multiple_of_k_via_independent_search(self):
+        """Bagimsiz kaba kuvvet: ilk saglayan N'yi bul, k'nin katina yuvarla (R27)."""
+        for f, pw, k in ((0.25, 0.80, 3), (0.25, 0.95, 3), (0.25, 0.95, 4), (0.4, 0.9, 5)):
+            first = next(n for n in range(k + 1, 100000) if A.anova_power(f, 0.05, k, n)[0] >= pw)
+            self.assertEqual(A.a_priori(f, 0.05, pw, k).n_total, k * math.ceil(first / k))
 
     def test_post_hoc_matches_a_priori_actual_power(self):
         a = A.a_priori(0.25, 0.05, 0.95, 3)
@@ -130,12 +110,9 @@ class ManualExample(unittest.TestCase):
         self.assertEqual(round(r.ncp, 6), 24.375)
 
     def test_unit_step_search_would_have_given_386_not_390(self):
-        old = A.ROUND_TO_MULTIPLE_OF_GROUPS
-        try:
-            A.ROUND_TO_MULTIPLE_OF_GROUPS = False
-            self.assertEqual(A.a_priori(0.25, 0.05, 0.95, 10).n_total, 386)
-        finally:
-            A.ROUND_TO_MULTIPLE_OF_GROUPS = old
+        first = next(n for n in range(11, 10000) if A.anova_power(0.25, 0.05, 10, n)[0] >= 0.95)
+        self.assertEqual(first, 386)
+        self.assertEqual(A.a_priori(0.25, 0.05, 0.95, 10).n_total, 390)
 
     def test_compromise_example_cross_check_with_printed_alpha(self):
         # Kılavuzun compromise çıktısı: alpha=0.159194, N=200, k=10 -> güç 0.840806, F* 1.476210
@@ -202,7 +179,7 @@ class Boundaries(unittest.TestCase):
 
     def test_unreachable_n_is_error_not_hang(self):
         with self.assertRaises(InputError):
-            A.a_priori(1e-5, 0.05, 0.99, 3)
+            A.a_priori(1e-6, 0.05, 0.9999999, 3)
 
 
 if __name__ == "__main__":
